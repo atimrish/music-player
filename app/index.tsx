@@ -1,5 +1,8 @@
 import {Dimensions, ImageBackground, StyleSheet, Text, View} from "react-native";
 import MusicSlider from "@/components/common/MusicSlider";
+import PlayerControls from "@/components/common/PlayerControls";
+import AudioContextProvider, {useAudioContext} from "@/context/AudioContext";
+
 
 const styles = StyleSheet.create({
     imageBackground: {
@@ -21,10 +24,33 @@ const styles = StyleSheet.create({
         color: '#F5F5F5',
         fontSize: 16,
         textAlign: 'center',
+    },
+    currentDurationText: {
+        color: '#989999',
+        fontSize: 16,
+        fontWeight: '600',
+        textAlign: 'center',
+        marginTop: 20,
+        marginBottom: 20,
+    },
+    musicTitle: {
+        fontSize: 24,
+        color: '#DBDCDC',
+        textAlign: 'center',
+        fontWeight: '600'
+    },
+    musicAuthor: {
+        fontSize: 18,
+        fontWeight: '500',
+        textAlign: 'center',
+        color: '#DBDCDC',
+        marginTop: 10
     }
 })
 
 export default function Index() {
+    const {sound} = useAudioContext();
+
     return (
         <View style={styles.mainContainer}>
             <ImageBackground
@@ -33,9 +59,19 @@ export default function Index() {
                 blurRadius={30}
             >
                 <View style={styles.paddingContainer}>
-                    <Text style={styles.text}>Слушается сейчас</Text>
-                    <MusicSlider/>
+                    <AudioContextProvider>
+                        <Text style={styles.text}>Слушается сейчас</Text>
+                        <MusicSlider/>
+
+                        <Text style={styles.currentDurationText}>{}</Text>
+
+                        <Text style={styles.musicTitle}>In Bloom</Text>
+                        <Text style={styles.musicAuthor}>Nirvana</Text>
+
+                        <PlayerControls/>
+                    </AudioContextProvider>
                 </View>
+
 
             </ImageBackground>
         </View>
