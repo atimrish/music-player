@@ -2,7 +2,7 @@ import {Dimensions, ImageBackground, StyleSheet, Text, View} from "react-native"
 import MusicSlider from "@/components/common/MusicSlider";
 import PlayerControls from "@/components/common/PlayerControls";
 import AudioContextProvider, {useAudioContext} from "@/context/AudioContext";
-
+import MusicTimer from "@/components/common/MusicTimer";
 
 const styles = StyleSheet.create({
     imageBackground: {
@@ -25,14 +25,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
     },
-    currentDurationText: {
-        color: '#989999',
-        fontSize: 16,
-        fontWeight: '600',
-        textAlign: 'center',
-        marginTop: 20,
-        marginBottom: 20,
-    },
+
     musicTitle: {
         fontSize: 24,
         color: '#DBDCDC',
@@ -62,9 +55,7 @@ export default function Index() {
                     <AudioContextProvider>
                         <Text style={styles.text}>Слушается сейчас</Text>
                         <MusicSlider/>
-
-                        <Text style={styles.currentDurationText}>{}</Text>
-
+                        <MusicTimer/>
                         <Text style={styles.musicTitle}>In Bloom</Text>
                         <Text style={styles.musicAuthor}>Nirvana</Text>
 
