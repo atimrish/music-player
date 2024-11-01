@@ -1,7 +1,7 @@
 import {Dimensions, ImageBackground, StyleSheet, Text, View} from "react-native";
 import MusicSlider from "@/components/common/MusicSlider";
 import PlayerControls from "@/components/common/PlayerControls";
-import AudioContextProvider, {useAudioContext} from "@/context/AudioContext";
+import AudioContextProvider from "@/context/AudioContext";
 import MusicTimer from "@/components/common/MusicTimer";
 
 const styles = StyleSheet.create({
@@ -25,12 +25,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
     },
-
     musicTitle: {
         fontSize: 24,
         color: '#DBDCDC',
         textAlign: 'center',
-        fontWeight: '600'
+        fontWeight: '600',
+        marginTop: 40
     },
     musicAuthor: {
         fontSize: 18,
@@ -42,7 +42,6 @@ const styles = StyleSheet.create({
 })
 
 export default function Index() {
-    const {sound} = useAudioContext();
 
     return (
         <View style={styles.mainContainer}>

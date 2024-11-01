@@ -5,7 +5,7 @@ import NextIcon from "@/components/icons/NextIcon";
 import RandomIcon from "@/components/icons/RandomIcon";
 import RepeatIcon from "@/components/icons/RepeatIcon";
 import {useEffect} from "react";
-import {Audio} from "expo-av";
+import {Audio, AVPlaybackStatusSuccess} from "expo-av";
 import PlayIcon from "@/components/icons/PlayIcon";
 import {useAudioContext} from "@/context/AudioContext";
 
@@ -29,39 +29,40 @@ const styles = StyleSheet.create({
 
 export default function PlayerControls() {
 
-    const {isPlaying, sound, setSound, setIsPlaying, setStatus} = useAudioContext()
+    const {
+        sound,
+        status,
+        setSound,
+        setStatus
+    } = useAudioContext()
 
     useEffect(() => {
         (async () => {
             const {sound, status} = await Audio.Sound.createAsync(require('@/assets/audio/In Bloom.mp3'))
             setSound(sound)
-            setStatus(status)
+            setStatus(status as AVPlaybackStatusSuccess)
         })()
     }, []);
 
-    useEffect(() => {
+    const setStatusOnClick = async () => {
         if (sound) {
-            isPlaying ? sound.playAsync() : sound.pauseAsync()
+            const newStatus = await sound.getStatusAsync() as AVPlaybackStatusSuccess
+            if (newStatus.isPlaying) {
+                setStatus(await sound.pauseAsync() as AVPlaybackStatusSuccess)
+            } else {
+                setStatus(await sound.playAsync() as AVPlaybackStatusSuccess)
+            }
         }
-    }, [isPlaying, sound]);
-
-    const mainButton = isPlaying ?
-        (
-            <View onTouchStart={() => setIsPlaying(false)}>
-                <PauseIcon/>
-            </View>
-        ) : (
-            <View onTouchStart={() => setIsPlaying(true)}>
-                <PlayIcon/>
-            </View>
-        )
+    }
 
     return (
         <View style={styles.playerControls}>
             <RandomIcon/>
             <View style={styles.playerInner}>
                 <PrevIcon/>
-                {mainButton}
+                <View onTouchStart={() => setStatusOnClick()}>
+                    {status && status.isPlaying ? <PauseIcon/> : <PlayIcon/>}
+                </View>
                 <NextIcon/>
             </View>
             <RepeatIcon/>

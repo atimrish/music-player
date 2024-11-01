@@ -1,10 +1,11 @@
-import {Text, StyleSheet} from 'react-native'
+import {StyleSheet, Text} from 'react-native'
 import {useAudioContext} from "@/context/AudioContext";
-import {useEffect} from "react";
+import {AVPlaybackStatusSuccess} from "expo-av";
+import {useEffect, useRef, useState} from "react";
 
-const formatTime = (time: number): string => {
-    const minutes = Math.floor(time / 60)
-    const seconds = time % 60;
+const formatTime = (millis: number): string => {
+    const minutes = Math.floor(millis / 60 / 1000)
+    const seconds = Math.floor(millis / 1000) % 60
     const minutesStr = minutes.toString().padStart(2, '0')
     const secondsStr = seconds.toString().padStart(2, '0')
     return `${minutesStr}:${secondsStr}`;
@@ -22,15 +23,21 @@ const styles = StyleSheet.create({
 })
 
 export default function MusicTimer() {
-    const {isPlaying, seconds, setSeconds} = useAudioContext()
+    const {
+        sound,
+        setStatus,
+        status
+    } = useAudioContext()
 
     useEffect(() => {
-        if (isPlaying) {
-            const interval = setInterval(() => setSeconds(prev => prev + 1), 1000)
+        if (sound && status && status.isPlaying) {
+            const interval = setInterval(async () => {
+                const status = await sound.getStatusAsync() as AVPlaybackStatusSuccess
+                setStatus(status)
+            }, 1000)
             return () => clearInterval(interval)
         }
+    }, [sound, status]);
 
-    }, [isPlaying]);
-
-    return <Text style={styles.currentDurationText}>{formatTime(seconds)}</Text>
+    return <Text style={styles.currentDurationText}>{formatTime(status?.positionMillis || 0)}</Text>
 }
