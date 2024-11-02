@@ -1,8 +1,7 @@
-import {Dimensions, ImageBackground, StyleSheet, Text, View} from "react-native";
+import {Dimensions, Image, ImageBackground, StyleSheet, Text, View} from "react-native";
 import MusicSlider from "@/components/common/MusicSlider";
 import PlayerControls from "@/components/common/PlayerControls";
-import AudioContextProvider from "@/context/AudioContext";
-import MusicTimer from "@/components/common/MusicTimer";
+import AudioServiceProvider from "@/services/audioService/context/AudioServiceContext";
 
 const styles = StyleSheet.create({
     imageBackground: {
@@ -38,7 +37,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#DBDCDC',
         marginTop: 10
-    }
+    },
+    musicCover: {
+        width: 200,
+        height: 200,
+        resizeMode: "cover",
+        borderRadius: 25,
+        marginTop: 40
+    },
 })
 
 export default function Index() {
@@ -51,15 +57,19 @@ export default function Index() {
                 blurRadius={30}
             >
                 <View style={styles.paddingContainer}>
-                    <AudioContextProvider>
+                    <AudioServiceProvider>
                         <Text style={styles.text}>Слушается сейчас</Text>
-                        <MusicSlider/>
-                        <MusicTimer/>
+
+                        <Image
+                            source={{uri: 'https://www.bygonely.com/wp-content/uploads/2023/02/Nirvana_Nevermind_Album_1.jpg'}}
+                            style={styles.musicCover}
+                        />
+
                         <Text style={styles.musicTitle}>In Bloom</Text>
                         <Text style={styles.musicAuthor}>Nirvana</Text>
-
+                        <MusicSlider/>
                         <PlayerControls/>
-                    </AudioContextProvider>
+                    </AudioServiceProvider>
                 </View>
 
 

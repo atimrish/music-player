@@ -1,74 +1,81 @@
-import {Image, StyleSheet, View, Text} from "react-native";
-import Svg, {Rect} from "react-native-svg";
-import {useAudioContext} from "@/context/AudioContext";
+import {Dimensions, StyleSheet, Text, View} from "react-native";
+import Svg, {Circle} from "react-native-svg";
+import {useAudioService} from "@/services/audioService/context/AudioServiceContext";
 
 const styles = StyleSheet.create({
+    container: {
+      width: "100%",
+    },
     slider: {
-        padding: 20,
-        shadowColor: "#000",
+        width: '100%',
+        height: 4,
+        backgroundColor: '#fff',
         marginTop: 40,
-        borderWidth: 3,
-        borderRadius: 35,
-        borderColor: '#DBDCDC'
+        marginBottom: 20,
+        borderRadius: 4,
+        position: 'relative',
+        overflow: 'visible'
     },
-    musicCover: {
-        width: 200,
-        height: 200,
-        resizeMode: "cover",
-        alignSelf: "center",
-        borderRadius: 25,
-    },
-    interactiveSlider: {
+    sliderInteractive: {
         position: 'absolute',
-        top: -3.5,
-        left: -3.5,
-        zIndex: 2
+        top: -8,
+        left: -4,
     },
-    interactiveCircle: {
-        position: "absolute",
-        zIndex: 3,
-        top: -15
+    timerBlock: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    timerText: {
+        color: '#DBDCDC',
+    },
+    sliderLine: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        height: 4,
+        backgroundColor: '#5182EF',
+        borderTopLeftRadius: 4,
+        borderBottomLeftRadius: 4
     }
 })
 
-export default function MusicSlider() {
-    const {status} = useAudioContext()
-    let seconds = 0
-    let allSeconds = 1
-    const allLength = 960
+const formatTime = (time: number): string => {
+    const minutes = Math.floor(time / 60 / 1000)
+    const seconds = Math.floor(time / 1000) % 60;
+    const minutesStr = minutes.toString().padStart(2, '0')
+    const secondsStr = seconds.toString().padStart(2, '0')
+    return `${minutesStr}:${secondsStr}`;
+}
 
-    if (status) {
-        seconds = Math.trunc(status.positionMillis / 1000)
-        allSeconds = status.durationMillis ? Math.trunc(status.durationMillis / 1000) : 1
+export default function MusicSlider() {
+    const {status} = useAudioService()
+    let pixelOffset = 0
+
+    if (status && status.durationMillis) {
+        const sliderWidth = Dimensions.get('window').width - 44
+        pixelOffset = status.positionMillis / status.durationMillis * sliderWidth
     }
 
     return (
-        <View>
+        <View style={styles.container}>
             <View style={styles.slider}>
-                <Image
-                    source={{uri: 'https://www.bygonely.com/wp-content/uploads/2023/02/Nirvana_Nevermind_Album_1.jpg'}}
-                    style={styles.musicCover}
-                />
+                <View style={{...styles.sliderLine, width: pixelOffset}} />
 
-                <Svg width={250} height={250} viewBox="0 0 250 250" style={styles.interactiveSlider}>
-                   <Rect
-                       x={2}
-                       y={2}
-                       width={243}
-                       height={243}
-                       rx={35}
-                       ry={35}
-                       fill="none"
-                       stroke="#5182EF"
-                       strokeWidth={4}
-                       strokeDasharray={[0,310,allLength / allSeconds * seconds, allLength - seconds]}
-                   />
+                <Svg
+                    width={20}
+                    height={20}
+                    viewBox={"0 0 20 20"}
+                    fill="none"
+                    style={{...styles.sliderInteractive, left: pixelOffset - 10}}
+                >
+                    <Circle r={8} fill="#fff" cx={10} cy={10} stroke="#5182EF" strokeWidth={4} />
                 </Svg>
-
-                {/*<Svg width={260} height={260} viewBox="0 0 260 260" style={styles.interactiveCircle}>*/}
-                {/*    <Circle r={10} x={120 + offset} y={13} fill="#5182EF" stroke="#DBDCDC" strokeWidth={5}/>*/}
-                {/*</Svg>*/}
-
+            </View>
+            <View style={styles.timerBlock}>
+                <Text style={styles.timerText}>{formatTime(status?.positionMillis || 0)}</Text>
+                <Text style={styles.timerText}>{formatTime(status?.durationMillis || 0)}</Text>
             </View>
         </View>
     );

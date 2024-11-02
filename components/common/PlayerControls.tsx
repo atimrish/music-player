@@ -5,9 +5,8 @@ import NextIcon from "@/components/icons/NextIcon";
 import RandomIcon from "@/components/icons/RandomIcon";
 import RepeatIcon from "@/components/icons/RepeatIcon";
 import {useEffect} from "react";
-import {Audio, AVPlaybackStatusSuccess} from "expo-av";
 import PlayIcon from "@/components/icons/PlayIcon";
-import {useAudioContext} from "@/context/AudioContext";
+import {useAudioService} from "@/services/audioService/context/AudioServiceContext";
 
 const styles = StyleSheet.create({
     playerControls: {
@@ -15,7 +14,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'center',
-        justifyContent: 'space-around',
+        justifyContent: 'space-between',
         width: '100%',
         marginTop: 40
     },
@@ -28,45 +27,32 @@ const styles = StyleSheet.create({
 })
 
 export default function PlayerControls() {
-
-    const {
-        sound,
-        status,
-        setSound,
-        setStatus
-    } = useAudioContext()
+    const {status, loadAudio, pauseAudio, playAudio} = useAudioService()
 
     useEffect(() => {
-        (async () => {
-            const {sound, status} = await Audio.Sound.createAsync(require('@/assets/audio/In Bloom.mp3'))
-            setSound(sound)
-            setStatus(status as AVPlaybackStatusSuccess)
-        })()
+        const data = require('@/assets/audio/In Bloom.mp3')
+        loadAudio && loadAudio(data)
     }, []);
 
     const setStatusOnClick = async () => {
-        if (sound) {
-            const newStatus = await sound.getStatusAsync() as AVPlaybackStatusSuccess
-            if (newStatus.isPlaying) {
-                setStatus(await sound.pauseAsync() as AVPlaybackStatusSuccess)
-            } else {
-                setStatus(await sound.playAsync() as AVPlaybackStatusSuccess)
-            }
+        if (status && pauseAudio && playAudio) {
+            status.isPlaying ? pauseAudio() : playAudio()
         }
     }
 
     return (
-        <View style={styles.playerControls}>
-            <RandomIcon/>
-            <View style={styles.playerInner}>
-                <PrevIcon/>
-                <View onTouchStart={() => setStatusOnClick()}>
-                    {status && status.isPlaying ? <PauseIcon/> : <PlayIcon/>}
+        <View>
+            <View style={styles.playerControls}>
+                <RandomIcon/>
+                <View style={styles.playerInner}>
+                    <PrevIcon/>
+                    <View onTouchStart={() => setStatusOnClick()}>
+                        {status && status.isPlaying ? <PauseIcon/> : <PlayIcon/>}
+                    </View>
+                    <NextIcon/>
                 </View>
-                <NextIcon/>
+                <RepeatIcon/>
             </View>
-            <RepeatIcon/>
         </View>
-
     );
 };
