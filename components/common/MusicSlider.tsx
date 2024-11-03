@@ -1,10 +1,12 @@
 import {Dimensions, StyleSheet, Text, View} from "react-native";
 import Svg, {Circle} from "react-native-svg";
 import {useAudioService} from "@/services/audioService/context/AudioServiceContext";
+import {OptimizeService} from "@/services/optimizeService/OptimizeService";
+import {useCallback, useRef} from "react";
 
 const styles = StyleSheet.create({
     container: {
-      width: "100%",
+        width: "100%",
     },
     slider: {
         width: '100%',
@@ -50,27 +52,50 @@ const formatTime = (time: number): string => {
 }
 
 export default function MusicSlider() {
-    const {status} = useAudioService()
-    let pixelOffset = 0
+    const {
+        status,
+        setPositionAudio,
+        pauseAudio,
+        playAudio
+    } = useAudioService()
 
-    if (status && status.durationMillis) {
-        const sliderWidth = Dimensions.get('window').width - 44
-        pixelOffset = status.positionMillis / status.durationMillis * sliderWidth
+    const isPlayingRef = useRef<boolean>(false)
+    const sliderWidth = Dimensions.get('window').width - 44
+
+    const pixelOffset = status && status.durationMillis ?
+        status.positionMillis / status.durationMillis * sliderWidth : 0
+
+    const onTouchMoveHandler = useCallback(OptimizeService.throttle(async (e) => {
+        if (status && status.durationMillis && setPositionAudio) {
+            await setPositionAudio(e.nativeEvent.pageX / sliderWidth * status.durationMillis)
+        }
+    }, 50), [])
+
+    const onTouchStartHandler = async () => {
+        isPlayingRef.current = Boolean(status && status.isPlaying)
+        pauseAudio && await pauseAudio()
+    }
+    const onTouchEndHandler = async () => {
+        if (pauseAudio && playAudio) {
+            isPlayingRef.current ? await playAudio() : await pauseAudio()
+        }
     }
 
     return (
         <View style={styles.container}>
             <View style={styles.slider}>
-                <View style={{...styles.sliderLine, width: pixelOffset}} />
-
+                <View style={{...styles.sliderLine, width: pixelOffset}}/>
                 <Svg
                     width={20}
                     height={20}
                     viewBox={"0 0 20 20"}
                     fill="none"
                     style={{...styles.sliderInteractive, left: pixelOffset - 10}}
+                    onTouchStart={onTouchStartHandler}
+                    onTouchMove={onTouchMoveHandler}
+                    onTouchEnd={onTouchEndHandler}
                 >
-                    <Circle r={8} fill="#fff" cx={10} cy={10} stroke="#5182EF" strokeWidth={4} />
+                    <Circle r={8} fill="#fff" cx={10} cy={10} stroke="#5182EF" strokeWidth={4}/>
                 </Svg>
             </View>
             <View style={styles.timerBlock}>

@@ -23,7 +23,13 @@ class AudioService {
 
     async pauseAudio() {
         if (this.audio) {
-            this. status = await this.audio.pauseAsync() as AVPlaybackStatusSuccess
+            this.status = await this.audio.pauseAsync() as AVPlaybackStatusSuccess
+        }
+    }
+
+    async setPositionAudio(position: number) {
+        if (this.audio && this.status) {
+            await this.audio.setPositionAsync(position)
         }
     }
 }

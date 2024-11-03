@@ -8,6 +8,7 @@ interface IAudioService {
     loadAudio: (data: any) => Promise<void>,
     playAudio: () => Promise<void>,
     pauseAudio: () => Promise<void>,
+    setPositionAudio: (position: number) => Promise<void>,
 }
 
 const AudioServiceContext = createContext<Partial<IAudioService>>({})
@@ -26,13 +27,24 @@ export default function AudioServiceProvider({children}: { children: ReactNode }
     }
 
     const playAudio: IAudioService['playAudio'] = async () => {
-        await audioService.current.playAudio()
-        setStatus(audioService.current.status)
+        if (audio) {
+            await audioService.current.playAudio()
+            setStatus(await audio.getStatusAsync() as AVPlaybackStatusSuccess)
+        }
     }
 
     const pauseAudio: IAudioService['pauseAudio'] = async () => {
-        await audioService.current.pauseAudio()
-        setStatus(audioService.current.status)
+        if (audio) {
+            await audioService.current.pauseAudio()
+            setStatus(await audio.getStatusAsync() as AVPlaybackStatusSuccess)
+        }
+    }
+
+    const setPositionAudio: IAudioService['setPositionAudio'] = async (position) => {
+        if (audio) {
+            await audioService.current.setPositionAudio(position)
+            setStatus(await audio.getStatusAsync() as AVPlaybackStatusSuccess)
+        }
     }
 
     useEffect(() => {
@@ -53,6 +65,7 @@ export default function AudioServiceProvider({children}: { children: ReactNode }
                 loadAudio,
                 playAudio,
                 pauseAudio,
+                setPositionAudio
             }}
         >
             {children}
