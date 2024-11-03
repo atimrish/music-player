@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     slider: {
         width: '100%',
         height: 4,
-        backgroundColor: '#fff',
+        backgroundColor: '#7D7D7D',
         marginTop: 40,
         marginBottom: 20,
         borderRadius: 4,
@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     timerText: {
-        color: '#DBDCDC',
+        color: '#7D7D7D',
+        fontFamily: 'Montserrat-Medium',
     },
     sliderLine: {
         position: 'absolute',

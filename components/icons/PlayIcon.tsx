@@ -6,7 +6,7 @@ export default function PlayIcon() {
             width={31.84}
             height={37.15}
             viewBox="0 0 31.84 37.15"
-            fill="#DBDCDC"
+            fill="#575353"
         >
             <Path
                 id="play-[#1003]"

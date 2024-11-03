@@ -1,4 +1,4 @@
-import {Dimensions, Image, ImageBackground, StyleSheet, Text, View} from "react-native";
+import {Dimensions, Image, StyleSheet, Text, View} from "react-native";
 import MusicSlider from "@/components/common/MusicSlider";
 import PlayerControls from "@/components/common/PlayerControls";
 import AudioServiceProvider from "@/services/audioService/context/AudioServiceContext";
@@ -20,27 +20,32 @@ const styles = StyleSheet.create({
         height: Dimensions.get("window").height,
     },
     text: {
-        color: '#F5F5F5',
+        color: '#575353',
         fontSize: 16,
         textAlign: 'center',
+        fontFamily: 'Montserrat-Medium',
+        fontWeight: 'medium'
     },
     musicTitle: {
         fontSize: 24,
-        color: '#DBDCDC',
+        color: '#575353',
         textAlign: 'center',
         fontWeight: '600',
-        marginTop: 40
+        marginTop: 40,
+        fontFamily: 'Montserrat-SemiBold',
+
     },
     musicAuthor: {
         fontSize: 18,
         fontWeight: '500',
         textAlign: 'center',
-        color: '#DBDCDC',
-        marginTop: 10
+        color: '#7D7D7D',
+        marginTop: 10,
+        fontFamily: 'Montserrat-Medium',
     },
     musicCover: {
-        width: 200,
-        height: 200,
+        width: 300,
+        height: 300,
         resizeMode: "cover",
         borderRadius: 25,
         marginTop: 40
@@ -51,29 +56,21 @@ export default function Index() {
 
     return (
         <View style={styles.mainContainer}>
-            <ImageBackground
-                source={{uri: 'https://www.bygonely.com/wp-content/uploads/2023/02/Nirvana_Nevermind_Album_1.jpg'}}
-                style={styles.imageBackground}
-                blurRadius={30}
-            >
+            <View style={styles.imageBackground}>
                 <View style={styles.paddingContainer}>
                     <AudioServiceProvider>
                         <Text style={styles.text}>Слушается сейчас</Text>
-
                         <Image
                             source={{uri: 'https://www.bygonely.com/wp-content/uploads/2023/02/Nirvana_Nevermind_Album_1.jpg'}}
                             style={styles.musicCover}
                         />
-
                         <Text style={styles.musicTitle}>In Bloom</Text>
                         <Text style={styles.musicAuthor}>Nirvana</Text>
                         <MusicSlider/>
                         <PlayerControls/>
                     </AudioServiceProvider>
                 </View>
-
-
-            </ImageBackground>
+            </View>
         </View>
 
     );
