@@ -1,23 +1,17 @@
-import {Dimensions, Image, StyleSheet, Text, View} from "react-native";
+import {Image, StyleSheet, Text, View} from "react-native";
 import MusicSlider from "@/components/common/MusicSlider";
 import PlayerControls from "@/components/common/PlayerControls";
 import AudioServiceProvider from "@/services/audioService/context/AudioServiceContext";
+import Wrapper from "@/components/common/Wrapper";
 
 const styles = StyleSheet.create({
-    imageBackground: {
-        flex: 1,
-        resizeMode: "cover",
-        paddingTop: 28,
-        paddingLeft: 22,
-        paddingRight: 22,
-    },
     paddingContainer: {
         justifyContent: "center",
         alignItems: "center",
     },
     mainContainer: {
         width: '100%',
-        height: Dimensions.get("window").height,
+        height: '100%',
     },
     text: {
         color: '#575353',
@@ -33,7 +27,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginTop: 40,
         fontFamily: 'Montserrat-SemiBold',
-
     },
     musicAuthor: {
         fontSize: 18,
@@ -53,10 +46,9 @@ const styles = StyleSheet.create({
 })
 
 export default function Index() {
-
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.imageBackground}>
+            <Wrapper>
                 <View style={styles.paddingContainer}>
                     <AudioServiceProvider>
                         <Text style={styles.text}>Слушается сейчас</Text>
@@ -70,7 +62,7 @@ export default function Index() {
                         <PlayerControls/>
                     </AudioServiceProvider>
                 </View>
-            </View>
+            </Wrapper>
         </View>
 
     );
