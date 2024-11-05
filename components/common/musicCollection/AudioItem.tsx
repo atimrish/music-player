@@ -45,7 +45,7 @@ export default function AudioItem(p: AudioItemProps) {
             <View style={styles.firstFlex}>
                 <Image
                     style={styles.audioCover}
-                    source={{uri: p.uri}}
+                    src={p.uri}
                 />
                 <View>
                     <Text style={styles.title}>{p.title}</Text>

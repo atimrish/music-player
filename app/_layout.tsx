@@ -1,15 +1,18 @@
 import {StatusBar} from "expo-status-bar";
-import {router, Slot, SplashScreen} from "expo-router";
+import {Slot, SplashScreen} from "expo-router";
 import {Dimensions, StyleSheet, View} from "react-native";
 import Constants from "expo-constants/src/Constants";
 import {useFonts} from "expo-font";
 import {useEffect} from "react";
+import {DBService} from "@/services/databaseService/DBService";
+import GlobalContextProvider from "@/context/GlobalContext";
+import {StorageService} from "@/services/storageService/StorageService";
 
 const styles = StyleSheet.create({
     container: {
         paddingTop: Constants.statusBarHeight + 28,
         backgroundColor: '#E9ECEE',
-        minHeight: Dimensions.get('window').height,
+        minHeight: Dimensions.get('screen').height,
     }
 })
 
@@ -25,8 +28,12 @@ export default function App() {
         if (loaded || error) {
             SplashScreen.hideAsync()
         }
-        router.navigate('/collection')
     }, [loaded, error]);
+
+    useEffect(() => {
+        DBService.migrateIfNeeded()
+        StorageService.initIfNeeded()
+    }, []);
 
     if (!loaded && !error) {
         return null;
@@ -35,10 +42,10 @@ export default function App() {
     return (
         <>
             <View style={styles.container}>
-                <View>
+                <GlobalContextProvider>
                     <StatusBar style="auto" translucent={true}/>
                     <Slot/>
-                </View>
+                </GlobalContextProvider>
             </View>
         </>
 

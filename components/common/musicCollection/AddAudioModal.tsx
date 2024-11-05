@@ -5,6 +5,9 @@ import RadioGroup, {RadioButtonProps} from "react-native-radio-buttons-group";
 import {useState} from "react";
 import Button from "@/components/ui/Button"
 import {StorageService} from "@/services/storageService/StorageService";
+import {AudioModel} from "@/services/databaseService/models/AudioModel";
+import {useGlobalContext} from "@/context/GlobalContext";
+import {StringService} from "@/services/stringService/StringService";
 
 const styles = StyleSheet.create({
     modal: {
@@ -86,60 +89,68 @@ const radio: Array<RadioButtonProps> = [
         id: '2',
         label: 'внутреннее хранилище',
         value: 'option2'
-    },
-    {
-        id: '3',
-        label: 'ссылку YouTube to mp3',
-        value: 'option2'
     }
 ]
 
 interface IAddAudioForm {
     title: string,
     author: string,
-    downloadBy?: '1' | '2' | '3',
+    downloadBy?: '1' | '2'
     imageURI: string,
-    linkURI?: string,
-    localURI?: string,
-    youTubeURI?: string
+    linkURI: string,
+    localURI: string
 }
 
 export default function AddAudioModal(p: Props) {
     const [selectedId, setSelectedId] = useState('')
+    const {fetchAudios} = useGlobalContext()
 
     const [formState, setFormState] = useState<IAddAudioForm>({
         title: '',
         author: '',
         imageURI: '',
-        linkURI: ''
+        linkURI: '',
+        localURI: ''
     })
 
     const handleDocumentPick = async () => {
         const {canceled, assets} = await StorageService.pick({type: 'audio/mpeg'})
-        if (!canceled) {
-            setFormState({...formState, localURI: assets[0].uri})
-        }
+        !canceled && setFormState({...formState, localURI: assets[0].uri})
     }
 
     const handleCoverPick = async () => {
         const {canceled, assets} = await StorageService.pick({type: 'image/*'})
-        if (!canceled) {
-            setFormState({...formState, imageURI: assets[0].uri})
-        }
+        !canceled && setFormState({...formState, imageURI: assets[0].uri})
     }
 
     const handleSubmit = async () => {
+        const coverExt = formState.imageURI.split('.').at(-1)
+        const randomStr = StringService.randomString()
+        const audioFileName = StorageService.AUDIO_PREFIX + StorageService.DELIMITER + randomStr + '.mp3'
+        const coverFileName = StorageService.IMAGE_PREFIX + StorageService.DELIMITER + randomStr + '.' + coverExt
+
         if (selectedId === '1') {
-            await StorageService.download(formState.linkURI || '')
+            await AudioModel.create({
+                id: 0,
+                title: formState.title,
+                author: formState.author,
+                uri: await StorageService.download(formState.linkURI, audioFileName),
+                cover: await StorageService.copyToStorage(formState.imageURI, coverFileName)
+            })
         }
 
         if (selectedId === '2') {
-
+            await AudioModel.create({
+                id: 0,
+                title: formState.title,
+                author: formState.author,
+                uri: await StorageService.copyToStorage(formState.localURI, audioFileName),
+                cover: await StorageService.copyToStorage(formState.imageURI, coverFileName)
+            })
         }
 
-        if (selectedId === '3') {
-
-        }
+        await fetchAudios()
+        p.closeModal()
     }
 
     return (
@@ -205,14 +216,6 @@ export default function AddAudioModal(p: Props) {
                                 style={styles.selectFile}
                                 onPress={handleDocumentPick}
                             >Выбрать файл</Text>
-                        }
-
-                        {selectedId === '3' &&
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="ссылка на видео YouTube"
-                                value={formState.youTubeURI}
-                            />
                         }
 
                         <View style={styles.buttonsBlock}>

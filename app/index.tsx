@@ -1,69 +1,61 @@
-import {Image, StyleSheet, Text, View} from "react-native";
-import MusicSlider from "@/components/common/MusicSlider";
-import PlayerControls from "@/components/common/PlayerControls";
-import AudioServiceProvider from "@/services/audioService/context/AudioServiceContext";
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import AudioItem from "@/components/common/musicCollection/AudioItem";
 import Wrapper from "@/components/common/Wrapper";
+import AddIcon from "@/components/icons/AddIcon";
+import {useEffect, useState} from "react";
+import AddAudioModal from "@/components/common/musicCollection/AddAudioModal";
+import {useGlobalContext} from "@/context/GlobalContext";
 
 const styles = StyleSheet.create({
-    paddingContainer: {
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    mainContainer: {
-        width: '100%',
-        height: '100%',
-    },
-    text: {
+    heading: {
         color: '#575353',
-        fontSize: 16,
-        textAlign: 'center',
-        fontFamily: 'Montserrat-Medium',
-        fontWeight: 'medium'
-    },
-    musicTitle: {
-        fontSize: 24,
-        color: '#575353',
-        textAlign: 'center',
-        fontWeight: '600',
-        marginTop: 40,
+        fontSize: 20,
         fontFamily: 'Montserrat-SemiBold',
     },
-    musicAuthor: {
-        fontSize: 18,
-        fontWeight: '500',
-        textAlign: 'center',
-        color: '#7D7D7D',
-        marginTop: 10,
-        fontFamily: 'Montserrat-Medium',
+    headingBlock: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 22
     },
-    musicCover: {
-        width: 300,
-        height: 300,
-        resizeMode: "cover",
-        borderRadius: 25,
-        marginTop: 40
-    },
+
 })
 
 export default function Index() {
+    const [modalVisible, setModalVisible] = useState(false);
+    const {audios, fetchAudios} = useGlobalContext()
+
+    useEffect(() => {
+        fetchAudios()
+    }, []);
+
     return (
-        <View style={styles.mainContainer}>
+        <View>
             <Wrapper>
-                <View style={styles.paddingContainer}>
-                    <AudioServiceProvider>
-                        <Text style={styles.text}>Слушается сейчас</Text>
-                        <Image
-                            source={{uri: 'https://www.bygonely.com/wp-content/uploads/2023/02/Nirvana_Nevermind_Album_1.jpg'}}
-                            style={styles.musicCover}
-                        />
-                        <Text style={styles.musicTitle}>In Bloom</Text>
-                        <Text style={styles.musicAuthor}>Nirvana</Text>
-                        <MusicSlider/>
-                        <PlayerControls/>
-                    </AudioServiceProvider>
+                <View style={styles.headingBlock}>
+                    <Text style={styles.heading}>Коллекция</Text>
+                    <TouchableOpacity onPress={() => setModalVisible(true)}>
+                        <AddIcon/>
+                    </TouchableOpacity>
                 </View>
             </Wrapper>
+            <FlatList
+                data={audios}
+                renderItem={(i) =>
+                    <Wrapper>
+                        <AudioItem
+                            style={{marginVertical: 8}}
+                            uri={i.item.cover}
+                            title={i.item.title}
+                            author={i.item.author}
+                        />
+                    </Wrapper>
+                }
+            />
+            <AddAudioModal
+                modalVisible={modalVisible}
+                closeModal={() => setModalVisible(false)}
+            />
         </View>
-
-    );
-};
+    )
+}
