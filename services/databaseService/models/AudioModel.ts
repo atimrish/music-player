@@ -22,6 +22,10 @@ class AudioModel {
     static async create(data: IAudioModel): Promise<number> {
         return await DBService.create<IAudioModel>(this.TABLE_NAME, data)
     }
+
+    static async deleteById(id: number) {
+        return await DBService.deleteById(this.TABLE_NAME, id)
+    }
 }
 
 export {AudioModel, IAudioModel}

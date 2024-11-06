@@ -10,7 +10,7 @@ class AudioService {
     }
 
     async loadAudio(uri: any) {
-        const {sound, status} = await Audio.Sound.createAsync(uri)
+        const {sound, status} = await Audio.Sound.createAsync({uri})
         this.audio = sound
         this.status = status as AVPlaybackStatusSuccess
     }
@@ -31,6 +31,10 @@ class AudioService {
         if (this.audio && this.status) {
             await this.audio.setPositionAsync(position)
         }
+    }
+
+    async unloadAudio() {
+        await this.audio?.unloadAsync()
     }
 }
 

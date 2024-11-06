@@ -2,7 +2,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system"
 
 class StorageService {
-    static DELIMITER = '\\'
+    static DELIMITER = '/'
     static AUDIO_PREFIX = 'audio'
     static IMAGE_PREFIX = 'image'
     static AUDIO_DIR = FileSystem.documentDirectory + this.DELIMITER + this.AUDIO_PREFIX
@@ -33,6 +33,10 @@ class StorageService {
         const path = FileSystem.documentDirectory + filename
         await FileSystem.downloadAsync(uri, path)
         return path
+    }
+
+    static async delete(uri: string) {
+        await FileSystem.deleteAsync(uri)
     }
 }
 

@@ -7,6 +7,7 @@ import {useEffect} from "react";
 import {DBService} from "@/services/databaseService/DBService";
 import GlobalContextProvider from "@/context/GlobalContext";
 import {StorageService} from "@/services/storageService/StorageService";
+import AudioServiceProvider from "@/services/audioService/context/AudioServiceContext";
 
 const styles = StyleSheet.create({
     container: {
@@ -43,8 +44,10 @@ export default function App() {
         <>
             <View style={styles.container}>
                 <GlobalContextProvider>
-                    <StatusBar style="auto" translucent={true}/>
-                    <Slot/>
+                    <AudioServiceProvider>
+                        <StatusBar style="auto" translucent={true}/>
+                        <Slot/>
+                    </AudioServiceProvider>
                 </GlobalContextProvider>
             </View>
         </>

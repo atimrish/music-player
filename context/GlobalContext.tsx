@@ -19,7 +19,7 @@ export default function GlobalContextProvider({children}: { children: ReactNode 
     const [audios, setAudios] = useState<Array<IAudioModel>>([])
 
     const fetchAudios = async () => {
-         setAudios(await AudioModel.getAll())
+        setAudios(await AudioModel.getAll())
     }
 
     return (

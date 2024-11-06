@@ -45,7 +45,9 @@ export default function Index() {
                     <Wrapper>
                         <AudioItem
                             style={{marginVertical: 8}}
-                            uri={i.item.cover}
+                            id={i.item.id}
+                            coverUri={i.item.cover}
+                            audioUri={i.item.uri}
                             title={i.item.title}
                             author={i.item.author}
                         />

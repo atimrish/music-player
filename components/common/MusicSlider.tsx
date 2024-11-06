@@ -1,8 +1,8 @@
-import {Dimensions, StyleSheet, Text, View} from "react-native";
+import {Dimensions, GestureResponderEvent, StyleSheet, Text, View} from "react-native";
 import Svg, {Circle} from "react-native-svg";
 import {useAudioService} from "@/services/audioService/context/AudioServiceContext";
 import {OptimizeService} from "@/services/optimizeService/OptimizeService";
-import {useCallback, useRef} from "react";
+import {useCallback, useRef, useState} from "react";
 
 const styles = StyleSheet.create({
     container: {
@@ -52,6 +52,8 @@ const formatTime = (time: number): string => {
     return `${minutesStr}:${secondsStr}`;
 }
 
+const sliderWidth = Dimensions.get('window').width - 44
+
 export default function MusicSlider() {
     const {
         status,
@@ -60,38 +62,48 @@ export default function MusicSlider() {
         playAudio
     } = useAudioService()
 
-    const isPlayingRef = useRef<boolean>(false)
-    const sliderWidth = Dimensions.get('window').width - 44
+    const isPlayingRef = useRef(false)
 
-    const pixelOffset = status && status.durationMillis ?
-        status.positionMillis / status.durationMillis * sliderWidth : 0
-
-    const onTouchMoveHandler = useCallback(OptimizeService.throttle(async (e) => {
-        if (status && status.durationMillis && setPositionAudio) {
-            await setPositionAudio(e.nativeEvent.pageX / sliderWidth * status.durationMillis)
-        }
-    }, 50), [])
+    const [percent, setPercent] = useState<number>(0)
+    const [isTouching, setIsTouching] = useState<boolean>(false)
 
     const onTouchStartHandler = async () => {
-        isPlayingRef.current = Boolean(status && status.isPlaying)
-        pauseAudio && await pauseAudio()
+        isPlayingRef.current = status?.isPlaying || false
+        setIsTouching(true)
     }
+
+    const onTouchMoveHandler = useCallback(OptimizeService.throttle(async (e: GestureResponderEvent) => {
+        setPercent((e.nativeEvent.pageX - 22) / sliderWidth)
+    }, 50), [])
+
     const onTouchEndHandler = async () => {
-        if (pauseAudio && playAudio) {
-            isPlayingRef.current ? await playAudio() : await pauseAudio()
+        if (pauseAudio && playAudio && status && status.durationMillis && setPositionAudio) {
+            await setPositionAudio(status.durationMillis * percent)
         }
+        isPlayingRef.current ? playAudio?.() : pauseAudio?.()
+        setIsTouching(false)
     }
+
+    let positionOffset = (() => {
+        if (isTouching) {
+            return percent
+        } else if (status && status.durationMillis) {
+            return status.positionMillis / status.durationMillis
+        }
+        return 0
+    })()
+
 
     return (
         <View style={styles.container}>
             <View style={styles.slider}>
-                <View style={{...styles.sliderLine, width: pixelOffset}}/>
+                <View style={{...styles.sliderLine, width: sliderWidth * positionOffset}}/>
                 <Svg
                     width={20}
                     height={20}
                     viewBox={"0 0 20 20"}
                     fill="none"
-                    style={{...styles.sliderInteractive, left: pixelOffset - 10}}
+                    style={{...styles.sliderInteractive, left: sliderWidth * positionOffset - 10}}
                     onTouchStart={onTouchStartHandler}
                     onTouchMove={onTouchMoveHandler}
                     onTouchEnd={onTouchEndHandler}

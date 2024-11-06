@@ -28,7 +28,7 @@ class DBService {
 
     static async getById<T>(tableName: string, id: number): Promise<T> {
         const db = await SQLite.openDatabaseAsync(DB_FILE_NAME)
-        const res = await db.getFirstAsync('SELECT * FROM ${tableName} WHERE id = ${id}`)')
+        const res = await db.getFirstAsync(`SELECT * FROM ${tableName} WHERE id = ${id}`)
         await db.closeAsync()
         return res as T
     }
@@ -48,6 +48,12 @@ class DBService {
 
         await db.closeAsync()
         return lastInsertRowId
+    }
+
+    static async deleteById(tableName: string, id: number) {
+        const db = await SQLite.openDatabaseAsync(DB_FILE_NAME)
+        await db.runAsync(`DELETE FROM ${tableName} WHERE id = ${id}`)
+        await db.closeAsync()
     }
 }
 

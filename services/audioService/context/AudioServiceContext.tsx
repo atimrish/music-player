@@ -16,11 +16,14 @@ const useAudioService = () => useContext(AudioServiceContext)
 
 export default function AudioServiceProvider({children}: { children: ReactNode }) {
     const audioService = useRef(new AudioService())
-
     const [audio, setAudio] = useState(audioService.current.audio)
     const [status, setStatus] = useState(audioService.current.status)
 
     const loadAudio: IAudioService['loadAudio'] = async (uri) => {
+        if (audio) {
+            await audioService.current.unloadAudio()
+        }
+
         await audioService.current.loadAudio(uri)
         setAudio(audioService.current.audio)
         setStatus(audioService.current.status)
@@ -52,7 +55,6 @@ export default function AudioServiceProvider({children}: { children: ReactNode }
             const interval = setInterval(async () => {
                 setStatus(await audio.getStatusAsync() as AVPlaybackStatusSuccess)
             }, 1000)
-
             return () => clearInterval(interval)
         }
     }, [status]);

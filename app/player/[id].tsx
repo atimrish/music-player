@@ -1,8 +1,11 @@
 import {Image, StyleSheet, Text, View} from "react-native";
 import MusicSlider from "@/components/common/MusicSlider";
 import PlayerControls from "@/components/common/PlayerControls";
-import AudioServiceProvider from "@/services/audioService/context/AudioServiceContext";
+import {useAudioService} from "@/services/audioService/context/AudioServiceContext";
 import Wrapper from "@/components/common/Wrapper";
+import {useLocalSearchParams} from "expo-router";
+import {useEffect, useRef, useState} from "react";
+import {AudioModel, IAudioModel} from "@/services/databaseService/models/AudioModel";
 
 const styles = StyleSheet.create({
     paddingContainer: {
@@ -45,22 +48,40 @@ const styles = StyleSheet.create({
     },
 })
 
-export default function Player() {
+export default function Id() {
+    const {id} = useLocalSearchParams();
+    const {loadAudio} = useAudioService()
+    const [audioState, setAudioState] = useState<IAudioModel>({
+        id: 0,
+        title: '',
+        author: '',
+        cover: '',
+        uri: ''
+    })
+
+    useEffect(() => {
+        AudioModel.getById(+id).then(res => setAudioState(res))
+    }, []);
+
+    useEffect(() => {
+        if (loadAudio && audioState.uri.length > 0) {
+            loadAudio(audioState.uri)
+        }
+    }, [audioState]);
+
     return (
         <View style={styles.mainContainer}>
             <Wrapper>
                 <View style={styles.paddingContainer}>
-                    <AudioServiceProvider>
-                        <Text style={styles.text}>Слушается сейчас</Text>
-                        <Image
-                            source={{uri: 'https://www.bygonely.com/wp-content/uploads/2023/02/Nirvana_Nevermind_Album_1.jpg'}}
-                            style={styles.musicCover}
-                        />
-                        <Text style={styles.musicTitle}>In Bloom</Text>
-                        <Text style={styles.musicAuthor}>Nirvana</Text>
-                        <MusicSlider/>
-                        <PlayerControls/>
-                    </AudioServiceProvider>
+                    <Text style={styles.text}>Слушается сейчас</Text>
+                    <Image
+                        src={audioState.cover}
+                        style={styles.musicCover}
+                    />
+                    <Text style={styles.musicTitle}>{audioState.title}</Text>
+                    <Text style={styles.musicAuthor}>{audioState.author}</Text>
+                    <MusicSlider/>
+                    <PlayerControls/>
                 </View>
             </Wrapper>
         </View>
