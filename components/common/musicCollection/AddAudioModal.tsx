@@ -124,7 +124,7 @@ export default function AddAudioModal(p: Props) {
     }
 
     const handleSubmit = async () => {
-        const coverExt = formState.imageURI.split('.').at(-1)
+        const coverExt = StringService.fileExtension(formState.imageURI)
         const randomStr = StringService.randomString()
         const audioFileName = StorageService.AUDIO_PREFIX + StorageService.DELIMITER + randomStr + '.mp3'
         const coverFileName = StorageService.IMAGE_PREFIX + StorageService.DELIMITER + randomStr + '.' + coverExt

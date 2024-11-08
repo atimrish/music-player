@@ -1,10 +1,12 @@
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import AudioItem from "@/components/common/musicCollection/AudioItem";
 import Wrapper from "@/components/common/Wrapper";
 import AddIcon from "@/components/icons/AddIcon";
 import {useEffect, useState} from "react";
 import AddAudioModal from "@/components/common/musicCollection/AddAudioModal";
 import {useGlobalContext} from "@/context/GlobalContext";
+import ArrowRightIcon from "@/components/icons/ArrowRightIcon";
+import {router} from 'expo-router'
 
 const styles = StyleSheet.create({
     heading: {
@@ -18,7 +20,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 22
     },
-
+    playlistText: {
+        fontFamily: 'Montserrat-SemiBold',
+        color: '#575353',
+    },
+    playlistBlock: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        backgroundColor: '#E2EBED',
+        borderRadius: 10,
+        alignItems: 'center',
+    }
 })
 
 export default function Index() {
@@ -38,6 +52,10 @@ export default function Index() {
                         <AddIcon/>
                     </TouchableOpacity>
                 </View>
+                <Pressable style={styles.playlistBlock} onPress={() => router.navigate('/playlist')}>
+                    <Text style={styles.playlistText}>Плейлисты</Text>
+                    <ArrowRightIcon/>
+                </Pressable>
             </Wrapper>
             <FlatList
                 data={audios}

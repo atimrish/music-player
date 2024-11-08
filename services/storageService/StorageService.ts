@@ -3,19 +3,25 @@ import * as FileSystem from "expo-file-system"
 
 class StorageService {
     static DELIMITER = '/'
+
     static AUDIO_PREFIX = 'audio'
     static IMAGE_PREFIX = 'image'
+    static PLAYLIST_PREFIX = 'playlist'
+
     static AUDIO_DIR = FileSystem.documentDirectory + this.DELIMITER + this.AUDIO_PREFIX
     static IMAGE_DIR = FileSystem.documentDirectory + this.DELIMITER + this.IMAGE_PREFIX
+    static PLAYLIST_DIR = FileSystem.documentDirectory + this.DELIMITER + this.PLAYLIST_PREFIX
 
     static async initIfNeeded() {
         const readResult = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory || '')
-        if (!readResult.includes('audio')) {
+        if (!readResult.includes(this.AUDIO_PREFIX)) {
             await FileSystem.makeDirectoryAsync(this.AUDIO_DIR)
         }
-
-        if (!readResult.includes('image')) {
+        if (!readResult.includes(this.IMAGE_PREFIX)) {
             await FileSystem.makeDirectoryAsync(this.IMAGE_DIR)
+        }
+        if (!readResult.includes(this.PLAYLIST_PREFIX)) {
+            await FileSystem.makeDirectoryAsync(this.PLAYLIST_DIR)
         }
     }
 

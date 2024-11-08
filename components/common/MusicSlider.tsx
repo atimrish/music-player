@@ -3,6 +3,7 @@ import Svg, {Circle} from "react-native-svg";
 import {useAudioService} from "@/services/audioService/context/AudioServiceContext";
 import {OptimizeService} from "@/services/optimizeService/OptimizeService";
 import {useCallback, useRef, useState} from "react";
+import {StringService} from "@/services/stringService/StringService";
 
 const styles = StyleSheet.create({
     container: {
@@ -43,14 +44,6 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 4
     }
 })
-
-const formatTime = (time: number): string => {
-    const minutes = Math.floor(time / 60 / 1000)
-    const seconds = Math.floor(time / 1000) % 60;
-    const minutesStr = minutes.toString().padStart(2, '0')
-    const secondsStr = seconds.toString().padStart(2, '0')
-    return `${minutesStr}:${secondsStr}`;
-}
 
 const sliderWidth = Dimensions.get('window').width - 44
 
@@ -112,8 +105,8 @@ export default function MusicSlider() {
                 </Svg>
             </View>
             <View style={styles.timerBlock}>
-                <Text style={styles.timerText}>{formatTime(status?.positionMillis || 0)}</Text>
-                <Text style={styles.timerText}>{formatTime(status?.durationMillis || 0)}</Text>
+                <Text style={styles.timerText}>{StringService.formatTime(status?.positionMillis || 0)}</Text>
+                <Text style={styles.timerText}>{StringService.formatTime(status?.durationMillis || 0)}</Text>
             </View>
         </View>
     );
